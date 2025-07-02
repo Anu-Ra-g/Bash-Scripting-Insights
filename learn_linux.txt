@@ -1,0 +1,394 @@
+Learn Linux TV
+
+1_filesystem
+------------
+
+filesystem could also mean the way the harddrive was formatted. For example, in Windows, the harddrive  was formatted with NTFS filesystem.
+
+It also means the file structure of the actual harddrive Linux was installed onto. 
+
+ls
+ls -l
+cd
+pwd
+nano
+
+*  Everything in linux is a file. 
+
+2_basic_file_editing
+--------------------
+
+touch <filename>
+nano
+
+When using nano, you're writing stuff to a buffer and not to the actual file. The content gets written to the file after you've saved and quit the editor.
+
+which
+vim
+
+3_moving_renaming
+-----------------
+
+cp
+cat 
+diff
+rm
+rm -r 
+mv
+
+4_bash_config
+-------------
+
+Bash(Bourne again shell) is the default shell. In linux, there are several different shell like zsh, sh, fish etc. Shell are programs that interpret commands.
+Shell can be customized using the config files like bashrc file.
+
+* Anything with a period(.) will be hidden in linux
+
+* The default settings for shell configuration is present in /etc/skel/.bashrc. This is present in case you want to revert back to old bash config. 
+
+5_aliases
+---------
+
+alias c='clear'
+alias (prints out  all of the aliases in the config)
+unalias <alias name> (remove the specified alias)
+alias <alias name> (to see what is defined as alias)
+
+6_permissions
+------------------
+
+drwxrwxr-x 4 anurag anurag 4096 Jun 12 15:57 ./main.py
+
+d - directory(can -, l where "-" means file, "l" means links)
+rwx - user permissions
+rwx - group permission
+r-x -  other permission
+
+Meaning of each :
+r - read
+w - write 
+x - execute
+
+chmod [u|o|g|a][+|-|=][r|w|x] <filename>
+
+u - user
+g - group
+o - other
+a - all
+
+* Here "rwxrwxr", 
+the first three belongs to user,
+next three belongs to group,
+and the next three belongs to others.
+
+* These permission applies to both files and directory
+
+7_checking_resource_usage
+----------------
+
+free
+free -m (in megabytes)
+
+* difference between free and available memory is the memory that is free is completely unused and the memory that is termed as available is kept in reserve for process, caches etc.
+
+df
+df -h (in human readable form)
+df -i (defines the inodes)
+
+* in a linux system, you can have a finite number of files on the filesystem. Your harddrive in  linux system gets full when one of two things happen:
+1. You've filled your harddrive stuff
+2. You've used up all your inodes. So if your system has 300,000 inodes, and you've same number of text files, which don't take up much space, then you don't have any more space to use as all the inodes are used up.
+
+htop
+
+* You can interact with htop screen with mouse
+
+uptime
+
+```
+~👉 uptime                                   
+ 16:12:48 up  7:53,  1 user,  load average: 0.91, 0.74, 0.79
+
+# 0.91 (first)  - average number of processes running or waiting for CPU over the last 1 minute
+# 0.74 (second) - over the last 5 minutes
+# 0.79 (third)  - over the last 15 minutes
+
+These values represent the **total number of processes** that were either actively running on the CPU or waiting to run.
+
+This is a **system-wide metric**, not per core.
+
+So, if you have 8 CPU cores:
+- A load average of 0.91 means that, on average, **0.91 tasks in total** were demanding CPU time.
+- This is **0.91 / 8 = ~0.11 tasks per core**, on average.
+- Since the load is well below the number of cores, the system is **lightly loaded**, and there’s no CPU contention.
+```
+
+* Load average is the average number of processes that are either: Running on the CPU, or Waiting to run (in the run queue)
+
+8_package_management
+--------------------
+
+* It refers to ability of managing packages which is essentially is just another way of saying managing applications. Now packages can include other things like libraries.  
+
+updating repository index
+
+On every linux distro, we've the concept of repository. It is an online server that contains one or more packages. Most of the time you linux distro, has a main repository and along with other repositories that will contain other packages. 
+
+* Each linux has its own package management utility. 
+
+* Your packages index locally is synchronized with the servers externally, so that you can have the list of all the packages. 
+
+
+sudo apt update
+sudo apt search <package>
+sudo apt install <package>
+sudo apt remove <package>
+sudo apt autoremove (to remove transient dependencies)
+sudo apt upgrade
+sudo apt dist-upgrade
+
+| Component                    | Location                   | Purpose                                                 |
+| ---------------------------- | -------------------------- | ------------------------------------------------------- |
+| Package metadata & index     | `/var/lib/apt/lists/`      | Info about available packages from repos                |
+| Icons & visual metadata      | `/var/lib/apt/lists/`      | Icons and UI data for app centers (if applicable)       |
+| Actual software `.deb` files | `/var/cache/apt/archives/` | Downloaded software packages before installation        |
+| Installed package info       | `/var/lib/dpkg/status`     | Details about packages installed on your system         |
+| URLs for repositories        | `/etc/apt/sources.list.d/` | Stores URLs for package repositories (software sources) |
+
+
+`sudo apt update`APT the following:
+
+1. Reads the repository URLs from:
+
+/etc/apt/sources.list
+
+/etc/apt/sources.list.d/*.list
+
+And .sources files if using the new format
+
+2. Connects to each repository and downloads:
+
+Package lists (names, versions, architecture, etc.)
+
+Metadata like dependencies, descriptions, priorities
+
+3. Stores that metadata locally in:
+
+/var/lib/apt/lists/
+(Each file corresponds to a repo section, e.g. main, universe, etc.)
+
+9_managing_systemd
+------------------
+
+Managing a systemd unit or services,
+
+systemctl status <service>
+systemctl start <service>
+systemctl restart <service>
+systemctl disable <service>
+systemctl stop <service>
+
+10_managing_logs
+----------------
+
+* /var/log stores the logs for you system. The logs in this folder are rotated.
+
+* dmesg contains hardware related logs
+
+sudo dmesg
+
+head <file>
+tail <file>
+head -n <number> <file>
+tail -n <number> <file>
+tail -f <file>
+
+* journalctl is part of systemd that gives you another interface through which to view your log files and -u flag you can see the logs of the mentioned unit file
+
+journalctl -u ssh (also -f )
+
+11_managing_users
+-----------------
+
+* /etc/passwd is the file which contains the list of all the users on your system. There are also system users that come into play when you install different applications or packages which helps in logging into that specific application like postgres user which is created by default to login into the PostgreSQL database. 
+
+* A entry in /etc/passwd would look like this "anurag:x:1000:1000:anurag:/home/anurag:/bin/bash", it means
+
+anurag - username
+x - password
+1000 - user id 
+1000 - group id 
+anurag - actual name of the user
+/home/anurag - home directory of the user
+/bin/bash - default shell of the user
+
+* A user with /usr/sbin/nologin means he doesn't have to login to the system. 
+
+* user id with less than 1000 is mostly a system user unless you define otherwise. user id has to be unique for an user. 
+
+* /etc/shadow contains the password for the users in hashed form
+
+* /etc/group contains the list of the groups in the system
+
+groups (lists the groups which the current logined user is a part of )
+groups <user> (lists for the other user)
+
+adduser <username> (to create a user)
+
+su - <user> (to change to the user by knowing the password )
+sudo su - <user> (or you have to be root or with root prevelieges)
+
+passwd (to change the passwd for loggined user)
+
+sudo passwd <user> (to change the passwd from a differnt user with previleiges)
+
+sudo su - (to login to root user)
+
+* Ctrl + D to logout from the current user or exits from shell
+
+sudo userdel batman (to delete the user and -r to delete the user directories)
+
+sudo groupadd <groupname> (to create a group)
+
+sudo usermod -aG <groupname> <username> (to add a user to a group)
+
+gpasswd -d <username> <groupname> (to remove a user from a group)
+
+sudo !! (to execute the previous command)
+
+sudo groupdel <groupname> (to delete a group)
+
+12_history
+----------
+
+history 
+!<history number> (!345)
+
+* command with a space infront of it doesn't show up on history. This is the dependent upon the bash configuration.
+
+13_output_redirection
+---------------------
+
+ls -l > file.txt (output redirection)
+ls -l >> file.txt (append to the file)
+
+* The syntax is: <command> [> | >>] <file name>
+
+ls -l | grep main.py  (piping commands)
+
+* The pipe operator takes the standard output from the first command and pipes it into the second. You can continue this chain
+
+cat out.txt | sort | uniq
+cat out.txt | grep -v out.txt | sort | uniq (-v option is to not the given string in output)
+
+ls -l | wc -l (counts the lines in the output)
+
+14_streams
+----------
+
+Any commands output on the terminal tells the standard output. There are 3 streams with their designated numbers:
+1. stdout (1)
+2. stdin (0)
+3. stderr (2)
+
+find / -name *.log 2> error.txt 1> out.txt
+
+15_variables
+------------
+
+* variables created in a shell exists in that session only.
+
+env (prints the variables in your session)
+
+export test=1312 (to make a variable part of the environment variables for that session)
+
+16_find
+-------
+
+find <dir> -name <filename>
+find -type d -name log
+find -type f -name *.log
+
+find -name Music (searches for file or directory with given name)
+find -type d -name Music (searches for directory with given name)
+
+find /var -type f -name *.log -mtime 7 (lists any log files that was modified within the last 7 days)
+
+find /var -type f -name *.log -mtime 7 -exec rm {} \; (executes the rm command against all the log files modififed in the last 7 days)
+
+17_changing_permission_numerically
+----------------------------------
+
+The permission string are represented like this:
+r - 4
+w - 2 
+x - 1
+
+* So if you want to have total control for the user, then the command should be 
+"chmod 700 demo.sh" (7 for 4 + 2 + 1 full control for user)
+"chmod 070 demo.sh" (full control for group)
+"chmod 444 demo.sh" (only read access for the user, group, and other)
+"chmod 644 demo.sh" (follows the same pattern as above)
+
+18_openssh
+----------
+
+systemctl status ssh (server is installed or not)
+which sshd (to check ssh server daemon is installed or not)
+sudo apt install openssh-server
+
+* You can connect to a ssh server with two authentication
+1. password authentication
+2. key authentication
+
+sudo -l 
+nano /etc/ssh/sshd_config (to edit the ssh server configuration)
+
+* After changing the config, restart the ssh server with systemctl
+
+ssh <user>@<host ip> 
+ssh <host ip> (uses the current system's user as default)
+
+/var/log/auth.log (contains the logs for ssh)
+
+19_transferring_scp(secure cp)
+------
+
+* used to copy files from one linux to other and it comes with ssh package
+
+scp <source location> <user>@<host ip>:<destination location>
+
+* The above command also works in vice versa
+
+20_transferring_files_rsync
+---------------------------
+
+* You can copy files from point A to point B. The point B can be anything 
+
+rsync -rv <source location> <user>@<hostip>:<destination location>
+
+* rsync is smart enough to copy files that are not present in a directory, if you are copying the directory.   
+
+
+EXTRAs
+------
+
+sh - bourne shell
+bash - bourne again shell
+
+sh <file.sh> - using the intepreter to execute the script
+
+read <variable> - to read the user's input
+
+echo -e "..." (-e to intepret the escape sequences inside the content)
+
+$* - to print all the arguments passed to the script or function
+
+All command have exit status. 0 means no errors and anything else means errors
+
+[[ 4 -ge 5 ]]; echo $? (prints the exit status of the prior command)
+
+[[]] - for testing condition
+(()) - for evaluating arithmetic condition
+() - for subshell and command grouping
+[] - less features than [[]]
